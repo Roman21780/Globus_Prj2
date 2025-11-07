@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: Prj2
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crud_db
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    com.example.crud: DEBUG
