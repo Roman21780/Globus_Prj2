@@ -29,7 +29,12 @@ public class ExchangeRateService {
     public void updateRatesFromCBR() {
         try {
             String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            String xml = restTemplate.getForObject(CBR_URL + "?date_req" + today, String.class);
+            String xml = restTemplate.getForObject(CBR_URL + "?date_req=" + today, String.class);
+
+            if (xml == null) {
+                log.error("CBR responded with null XML");
+                return;
+            }
 
             rates = parseXML(xml);
             log.info("Updated {} exchange rates from CBR", rates.size());
