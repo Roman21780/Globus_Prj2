@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: cleanup-all-tables
+      author: admin
+      changes:
+        - sql:
+            sql: |
+              DELETE FROM users; 
+              ALTER SEQUENCE users_id_seq RESTART WITH 1;
+            splitStatements: true
+            stripComments: true
