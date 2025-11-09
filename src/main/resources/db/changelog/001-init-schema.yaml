@@ -3,15 +3,20 @@ databaseChangeLog:
       id: 001-create-users
       author: developer
       changes:
+        - createSequence:
+            sequenceName: users_id_seq
+            startValue: 1
+            incrementBy: 1
         - createTable:
             tableName: users
             columns:
               - column:
                   name: id
                   type: bigint
-                  autoIncrement: true
+                  defaultValueSequenceNext: users_id_seq
                   constraints:
                     primaryKey: true
+                    nullable: false
               - column:
                   name: email
                   type: varchar(255)
