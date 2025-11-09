@@ -61,12 +61,18 @@ public class ExchangeRateService {
         NodeList valuteList = doc.getElementsByTagName("Valute");
 
         for (int i = 0; i < valuteList.getLength(); i++) {
-            var valute = valuteList.item(i);
-            String code = valute.getChildNodes().item(2).getTextContent(); // CharCode
-            String rate = valute.getChildNodes().item(5).getTextContent(); // Value
+            var valute = (org.w3c.dom.Element) valuteList.item(i);
+
+            // Получаем коды и значения правильно
+            String code = valute.getElementsByTagName("CharCode").item(0).getTextContent();
+            String rate = valute.getElementsByTagName("Value").item(0).getTextContent();
+
             result.put(code, rate);
+
+            log.debug("Parsed: {} = {}", code, rate);
         }
 
+        log.info("Successfully parsed {} exchange rates", result.size());
         return result;
     }
 }
