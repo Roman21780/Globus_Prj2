@@ -29,7 +29,7 @@ GET {{baseUrl}}/users
 Accept: application/json
 
 ### 4. Get User by ID (Replace {id} with actual ID from create response)
-GET {{baseUrl}}/users/1
+GET {{baseUrl}}/users/7
 Accept: application/json
 
 ### 5. Update User by ID
