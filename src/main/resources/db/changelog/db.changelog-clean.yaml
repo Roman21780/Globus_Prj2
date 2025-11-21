@@ -6,8 +6,14 @@ databaseChangeLog:
       runOnChange: true
       changes:
         - sql:
+            sql: DELETE FROM exchange_rates;
+            splitStatements: false
+        - sql:
             sql: DELETE FROM users;
             splitStatements: false
         - sql:
             sql: SELECT setval('users_id_seq', 1, false);
+            splitStatements: false
+        - sql:
+            sql: SELECT setval('exchange_rates_id_seq', 1, false);
             splitStatements: false
