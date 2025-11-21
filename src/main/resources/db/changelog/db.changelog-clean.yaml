@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: cleanup-all-tables
+      author: admin
+      runAlways: true
+      runOnChange: true
+      changes:
+        - sql:
+            sql: DELETE FROM users;
+            splitStatements: false
+        - sql:
+            sql: SELECT setval('users_id_seq', 1, false);
+            splitStatements: false

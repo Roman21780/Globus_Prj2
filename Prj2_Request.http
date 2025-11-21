@@ -1,0 +1,113 @@
+@baseUrl = http://localhost:8080/api
+
+###############################################
+# User CRUD Operations
+###############################################
+
+### 1. Create User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "name": "John Doe",
+  "age": 30
+}
+
+### 2. Create Another User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "alice.smith@example.com",
+  "name": "Alice Smith",
+  "age": 25
+}
+
+### 3. Get All Users
+GET {{baseUrl}}/users
+Accept: application/json
+
+### 4. Get User by ID (Replace {id} with actual ID from create response)
+GET {{baseUrl}}/users/7
+Accept: application/json
+
+### 5. Update User by ID
+PUT {{baseUrl}}/users/1
+Content-Type: application/json
+
+{
+  "email": "john.updated@example.com",
+  "name": "John Updated",
+  "age": 31
+}
+
+### 6. Delete User by ID
+DELETE {{baseUrl}}/users/1
+
+###############################################
+# Exchange Rate Operations
+###############################################
+
+### 7. Get All Exchange Rates
+GET {{baseUrl}}/rates
+Accept: application/json
+
+### 8. Update Exchange Rates from CBR (Real)
+POST {{baseUrl}}/rates/update
+Content-Type: application/json
+
+### 9. Fake Update Exchange Rates
+POST {{baseUrl}}/rates/fake-update
+Content-Type: application/json
+
+###############################################
+# Error Cases / Validation Tests
+###############################################
+
+### 10. Create User with Invalid Email
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "name": "Test User",
+  "age": 20
+}
+
+### 11. Create User with Empty Name
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "name": "",
+  "age": 25
+}
+
+### 12. Create User with Negative Age
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "test2@example.com",
+  "name": "Test User",
+  "age": -5
+}
+
+### 13. Get Non-Existent User
+GET {{baseUrl}}/users/999
+Accept: application/json
+
+### 14. Update Non-Existent User
+PUT {{baseUrl}}/users/999
+Content-Type: application/json
+
+{
+  "email": "nobody@example.com",
+  "name": "Nobody",
+  "age": 30
+}
+
+### 15. Delete Non-Existent User
+DELETE {{baseUrl}}/users/999
