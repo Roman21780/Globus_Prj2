@@ -1,6 +1,7 @@
 package com.example.prj2.config;
 
 import com.example.prj2.dto.ExchangeRateEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -16,12 +17,15 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 @EnableKafka
 public class KafkaConfig {
@@ -84,15 +88,22 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String,
-            ExchangeRateEvent>> kafkaListenerContainerFactory() {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, ExchangeRateEvent>>
+    kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, ExchangeRateEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setCommonErrorHandler(new org.springframework.kafka.listener.DefaultErrorHandler());
+
+        // Обработчик ошибок десериализации
+        factory.setCommonErrorHandler(new DefaultErrorHandler((record, exception) -> {
+            log.error("Error processing record: {}, Exception: {}", record, exception.getMessage());
+            // Пропустить проблемное сообщение и продолжить
+        }, new FixedBackOff(1000, 3))); // 3 попытки с интервалом 1 сек
+
         factory.setConcurrency(3);
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
+
 
     // ===== Admin Configuration =====
 

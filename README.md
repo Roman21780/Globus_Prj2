@@ -22,3 +22,53 @@ psql -U roman - вход в БД
 mvnd clean test - запуск тестов
 mvnd clean install -DskipTests - сборка без тестов
 mvnd spring-boot:run -e  - запуск проекта
+
+найти процесс
+netstat -ano | findstr :8080
+завершить процесс
+taskkill /PID 30628 /F 
+
+# Очистить Kafka топик
+Вариант 1: Удалить и пересоздать топик через Docker
+bash
+# Зайти в контейнер Kafka
+docker exec -it kafka bash
+
+# Удалить топик
+kafka-topics --bootstrap-server localhost:9092 --delete --topic exchange-rates
+
+# Удалить топик user-events (если нужно)
+kafka-topics --bootstrap-server localhost:9092 --delete --topic user-events
+
+# Выйти из контейнера
+exit
+
+Вариант 2: Через docker-compose
+bash
+# Остановить контейнеры
+docker-compose down
+
+# Удалить все томы (это удалит все данные Kafka)
+docker-compose down -v
+
+# Запустить заново
+docker-compose up -d
+
+После очистки Kafka:
+Шаг 1: Перезагрузите приложение
+bash
+# Остановите текущее приложение (Ctrl + C)
+# Затем запустите его снова
+mvnd spring-boot:run -e
+
+Шаг 2: Тестируйте снова
+bash
+curl -X POST http://localhost:8080/api/rates/update
+
+Теперь в логах должны быть сообщения:
+
+text
+[INFO] Successfully parsed 185 exchange rates
+[INFO] Saved and sent to Kafka: USD = 100.5000
+[INFO] Received event from Kafka: code=USD, rate=100.5000
+[INFO] Exchange rate saved from Kafka: code=USD, rate=100.5000

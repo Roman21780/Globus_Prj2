@@ -24,7 +24,6 @@ public class ExchangeRateProducer {
                     .withPayload(event)
                     .setHeader(KafkaHeaders.TOPIC, "exchange-rates")
                     .setHeader("kafka_messageKey", event.getCode())
-                    .setHeader("timestamp", LocalDateTime.now().toString())
                     .build();
 
             kafkaTemplate.send(message);
@@ -32,7 +31,6 @@ public class ExchangeRateProducer {
                     event.getCode(), event.getRate(), event.getEventType());
         } catch (Exception e) {
             log.error("Failed to send event to Kafka", e);
-            throw new RuntimeException("Kafka send failed", e);
         }
     }
 }

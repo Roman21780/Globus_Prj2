@@ -21,6 +21,11 @@ public class ExchangeRateConsumer {
             log.info("Received event from Kafka: code={}, rate={}, type={}",
                     event.getCode(), event.getRate(), event.getEventType());
 
+            if (event.getCode() == null) {
+                log.warn("Received null or invalid event");
+                return;
+            }
+
             ExchangeRate exchangeRate = exchangeRateRepository
                     .findByCode(event.getCode())
                     .orElse(ExchangeRate.builder()
@@ -30,10 +35,10 @@ public class ExchangeRateConsumer {
             exchangeRate.setRate(event.getRate());
             exchangeRateRepository.save(exchangeRate);
 
-            log.info("Exchange rate saved: code={}, rate={}",
+            log.info("Exchange rate saved from Kafka: code={}, rate={}",
                     event.getCode(), event.getRate());
         } catch (Exception e) {
-            log.error("Failed to process exchange rate event", e);
+            log.error("Failed to process exchange rate event: {}", event, e);
         }
     }
 }
