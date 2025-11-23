@@ -41,17 +41,18 @@ class ExchangeRateControllerTest {
     }
 
     @Test
-    @DisplayName("POST /rates/update вызывает обновление и возвращает 'Updated'")
+    @DisplayName("POST /rates/update вызывает обновление и возвращает сообщение")
     void testUpdateRates() throws Exception {
         doNothing().when(exchangeRateService).updateRatesFromCBR();
 
         mockMvc.perform(post("/rates/update")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Updated"));
+                .andExpect(content().string("Updated and sent to Kafka"));
 
         verify(exchangeRateService, times(1)).updateRatesFromCBR();
     }
+
 
     @Test
     @DisplayName("POST /rates/fake-update вызывает фейковое обновление и возвращает 'Fake updated'")
