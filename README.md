@@ -14,3 +14,11 @@
 ## Прикрутить Kafka к проекту
 
 Реализовать Producer, Consumer, топики
+
+
+# Запуск проекта
+
+psql -U roman - вход в БД
+mvnd clean test - запуск тестов
+mvnd clean install -DskipTests - сборка без тестов
+mvnd spring-boot:run -e  - запуск проекта
