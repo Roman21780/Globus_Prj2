@@ -10,6 +10,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
@@ -40,17 +41,18 @@ class ExchangeRateControllerTest {
     }
 
     @Test
-    @DisplayName("POST /rates/update вызывает обновление и возвращает 'Updated'")
+    @DisplayName("POST /rates/update вызывает обновление и возвращает сообщение")
     void testUpdateRates() throws Exception {
         doNothing().when(exchangeRateService).updateRatesFromCBR();
 
         mockMvc.perform(post("/rates/update")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Updated"));
+                .andExpect(content().string("Updated and sent to Kafka"));
 
         verify(exchangeRateService, times(1)).updateRatesFromCBR();
     }
+
 
     @Test
     @DisplayName("POST /rates/fake-update вызывает фейковое обновление и возвращает 'Fake updated'")
@@ -63,5 +65,31 @@ class ExchangeRateControllerTest {
                 .andExpect(content().string("Fake updated"));
 
         verify(exchangeRateService, times(1)).fakeUpdateRates();
+    }
+
+    @Test
+    @DisplayName("POST /rates/update возвращает 500 при ошибке в сервисе")
+    void testUpdateRates_Error() throws Exception {
+        doThrow(new RuntimeException("Service error")).when(exchangeRateService).updateRatesFromCBR();
+
+        mockMvc.perform(post("/rates/update")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+
+        verify(exchangeRateService, times(1)).updateRatesFromCBR();
+    }
+
+    @Test
+    @DisplayName("GET /rates/db возвращает курсы из БД")
+    void testGetRatesFromDB() throws Exception {
+        Map<String, BigDecimal> dbRates = Map.of("USD", new BigDecimal("100.5"), "EUR", new BigDecimal("110.2"));
+        when(exchangeRateService.getAllRatesFromDB()).thenReturn(dbRates);
+
+        mockMvc.perform(get("/rates/db"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.USD").value(100.5))
+                .andExpect(jsonPath("$.EUR").value(110.2));
+
+        verify(exchangeRateService, times(1)).getAllRatesFromDB();
     }
 }

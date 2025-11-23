@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
@@ -22,10 +23,15 @@ public class ExchangeRateController {
         return ResponseEntity.ok(exchangeRateService.getRates());
     }
 
+    @GetMapping("/db")
+    public  ResponseEntity<Map<String, BigDecimal>> getRatesFromDB() {
+        return ResponseEntity.ok(exchangeRateService.getAllRatesFromDB());
+    }
+
     @PostMapping("/update")
     public ResponseEntity<String> updateRates() {
         exchangeRateService.updateRatesFromCBR();
-        return ResponseEntity.ok("Updated");
+        return ResponseEntity.ok("Updated and sent to Kafka");
     }
 
     @PostMapping("/fake-update")

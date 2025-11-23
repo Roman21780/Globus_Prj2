@@ -28,8 +28,8 @@ Content-Type: application/json
 GET {{baseUrl}}/users
 Accept: application/json
 
-### 4. Get User by ID (Replace {id} with actual ID from create response)
-GET {{baseUrl}}/users/7
+### 4. Get User by ID (Замените {id} на реальный ID)
+GET {{baseUrl}}/users/1
 Accept: application/json
 
 ### 5. Update User by ID
@@ -49,15 +49,19 @@ DELETE {{baseUrl}}/users/1
 # Exchange Rate Operations
 ###############################################
 
-### 7. Get All Exchange Rates
+### 7. Get All Exchange Rates (из памяти, не из БД)
 GET {{baseUrl}}/rates
 Accept: application/json
 
-### 8. Update Exchange Rates from CBR (Real)
+### 8. Get Exchange Rates from DB
+GET {{baseUrl}}/rates/db
+Accept: application/json
+
+### 9. Update Exchange Rates from CBR (Kafka event отправляется)
 POST {{baseUrl}}/rates/update
 Content-Type: application/json
 
-### 9. Fake Update Exchange Rates
+### 10. Fake Update Exchange Rates
 POST {{baseUrl}}/rates/fake-update
 Content-Type: application/json
 
@@ -65,7 +69,7 @@ Content-Type: application/json
 # Error Cases / Validation Tests
 ###############################################
 
-### 10. Create User with Invalid Email
+### 11. Create User with Invalid Email
 POST {{baseUrl}}/users
 Content-Type: application/json
 
@@ -75,7 +79,7 @@ Content-Type: application/json
   "age": 20
 }
 
-### 11. Create User with Empty Name
+### 12. Create User with Empty Name
 POST {{baseUrl}}/users
 Content-Type: application/json
 
@@ -85,7 +89,7 @@ Content-Type: application/json
   "age": 25
 }
 
-### 12. Create User with Negative Age
+### 13. Create User with Negative Age
 POST {{baseUrl}}/users
 Content-Type: application/json
 
@@ -95,11 +99,11 @@ Content-Type: application/json
   "age": -5
 }
 
-### 13. Get Non-Existent User
+### 14. Get Non-Existent User
 GET {{baseUrl}}/users/999
 Accept: application/json
 
-### 14. Update Non-Existent User
+### 15. Update Non-Existent User
 PUT {{baseUrl}}/users/999
 Content-Type: application/json
 
@@ -109,5 +113,5 @@ Content-Type: application/json
   "age": 30
 }
 
-### 15. Delete Non-Existent User
+### 16. Delete Non-Existent User
 DELETE {{baseUrl}}/users/999

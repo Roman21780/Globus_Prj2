@@ -1,6 +1,7 @@
 package com.example.prj2.controller;
 
 import com.example.prj2.entity.User;
+import com.example.prj2.exception.ResourceNotFoundException;
 import com.example.prj2.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -164,10 +165,10 @@ class UserControllerTest {
     @DisplayName("Should return 404 when user not found")
     void testGetUserById_NotFound() throws Exception {
         when(userService.getById(999L))
-                .thenThrow(new RuntimeException("User not found: 999"));
+                .thenThrow(new ResourceNotFoundException("User not found: 999"));
 
         mockMvc.perform(get("/users/999"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
 
         verify(userService, times(1)).getById(999L);
     }
@@ -231,13 +232,13 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Should handle delete of non-existent user")
+    @DisplayName("Should return 404 when delete non-existent user")
     void testDeleteUser_NotFound() throws Exception {
-        doThrow(new RuntimeException("User not found: 999"))
+        doThrow(new ResourceNotFoundException("User not found: 999"))
                 .when(userService).delete(999L);
 
         mockMvc.perform(delete("/users/999"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
 
         verify(userService, times(1)).delete(999L);
     }
@@ -282,4 +283,25 @@ class UserControllerTest {
 
         verify(userService, times(1)).create(ArgumentMatchers.any(User.class));
     }
+
+    @Test
+    @DisplayName("PUT /users/{id} возвращает 404 при обновлении несуществующего пользователя")
+    void testUpdateUser_NotFound() throws Exception {
+        User updateRequest = User.builder()
+                .email("nonexistent@example.com")
+                .name("Nonexistent")
+                .age(30)
+                .build();
+
+        when(userService.update(eq(999L), ArgumentMatchers.any(User.class)))
+                .thenThrow(new com.example.prj2.exception.ResourceNotFoundException("User not found: 999"));
+
+        mockMvc.perform(put("/users/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).update(eq(999L), ArgumentMatchers.any(User.class));
+    }
+
 }
