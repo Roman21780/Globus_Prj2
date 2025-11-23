@@ -50,4 +50,20 @@ class ExchangeRateServiceTest {
 
         assertTrue(rates.containsKey("USD"));
     }
+
+    @Test
+    void testUpdateRatesFromCBR_InvalidXML() {
+        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(null);
+
+        exchangeRateService.updateRatesFromCBR();
+        assertTrue(exchangeRateService.getRates().isEmpty());
+    }
+
+    @Test
+    void testUpdateRatesFromCBR_ParseException() {
+        when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn("<invalid></xml>");
+
+        // проверяем, что метод не выбрасывает исключения
+        assertDoesNotThrow(() -> exchangeRateService.updateRatesFromCBR());
+    }
 }

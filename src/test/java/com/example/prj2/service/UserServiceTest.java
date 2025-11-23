@@ -11,10 +11,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -52,5 +52,23 @@ public class UserServiceTest {
         User result = service.getById(1L);
 
         assertEquals(1L, result.getId());
+    }
+
+    @Test
+    void testCreate_EmailAlreadyExists() {
+        User user = User.builder().email("test@mail.com").name("Test").age(25).build();
+        when(repository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> service.create(user));
+        assertThat(thrown.getMessage()).isEqualTo("Email already exists");
+    }
+
+    @Test
+    void testDeleteUser_Success() {
+        when(repository.existsById(1L)).thenReturn(true);
+
+        service.delete(1L);
+
+        verify(repository, times(1)).deleteById(1L);
     }
 }

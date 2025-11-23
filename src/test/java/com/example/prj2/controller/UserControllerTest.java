@@ -282,4 +282,25 @@ class UserControllerTest {
 
         verify(userService, times(1)).create(ArgumentMatchers.any(User.class));
     }
+
+    @Test
+    @DisplayName("PUT /users/{id} возвращает 404 при обновлении несуществующего пользователя")
+    void testUpdateUser_NotFound() throws Exception {
+        User updateRequest = User.builder()
+                .email("nonexistent@example.com")
+                .name("Nonexistent")
+                .age(30)
+                .build();
+
+        when(userService.update(eq(999L), ArgumentMatchers.any(User.class)))
+                .thenThrow(new com.example.prj2.exception.ResourceNotFoundException("User not found: 999"));
+
+        mockMvc.perform(put("/users/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).update(eq(999L), ArgumentMatchers.any(User.class));
+    }
+
 }
